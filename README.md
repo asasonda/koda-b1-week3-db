@@ -1,38 +1,31 @@
 # Database ERD
 
-``` mermaid
+```mermaid
 erDiagram
-    USERS ||--|| PROFILE : has
-    USERS ||--o{ TRANSACTIONS : has
-    TRANSACTIONS ||--|| TRANSACTION_HISTORY : has
+    USERS ||--|| ACCOUNT : has
+    USERS ||--o{ TRANSACTIONS : makes
     USERS{
         int ID PK
+        varchar username
         varchar(UQ) email
         varchar password
-        varchar pin
-        varchar balance
+        timestamp created_at
     }
-    PROFILE{
-        int ID PK
-        int users_id FK
+    ACCOUNT{
+        int(UQ) users_id FK
         varchar fullname
         varchar phone
-        varchar address
         varchar photo
+        varchar pin
+        bigint balance
     }
     TRANSACTIONS{
         int ID PK
-        int users_id FK
-        varchar contact_pengirim
-        varchar contact_penerima
-        varchar nominal
-        timestamp created_at
+        int sender_id FK
+        int receiver_id FK
+        bigint nominal
+        varchar type
         varchar status
-    }
-    TRANSACTION_HISTORY{
-        int ID PK
-        int transactions_id FK
         timestamp created_at
     }
-
 ```

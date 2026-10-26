@@ -1,10 +1,6 @@
 CREATE DATABASE ewallet
 
 SELECT current_database()
--- drop table users
--- drop table account
--- drop TABLE transactions
-
 
 create table users(
     id int generated ALWAYS as IDENTITY PRIMARY KEY,
@@ -46,7 +42,6 @@ insert into users(username, email, password) VALUES
 ('chrmmyy@','charmy@gmail.com', 'charmy12345'),
 ('gyrel:@','grey@gmail.com', 'grey12345')
 
-select * from users
 
 insert into account(users_id, fullname, phone, photo, pin, balance) VALUES
 (1, 'Asta', '081345678900', 'asta.png', '349099', 345000),
@@ -60,8 +55,6 @@ insert into account(users_id, fullname, phone, photo, pin, balance) VALUES
 (9, 'Charmy Pappitson', '081921820518','charmy.jpg','156631', 860000),
 (10, 'Grey', '081309876543','grey.jpg','189900', 1050000)
 
-select * from account
-
 insert into transactions(sender_id, receiver_id, nominal, status) VALUES
 (1,8,30000,'Success'),
 (2,6,15000,'Success'),
@@ -69,8 +62,6 @@ insert into transactions(sender_id, receiver_id, nominal, status) VALUES
 (7,1, 100000, 'Success'),
 (10,2, 10000, 'Success'),
 (4,3,5000,'Success')
-
-select * from transactions
 
 
 
@@ -134,76 +125,61 @@ WHERE users_id = 12
 
 -- transaction history (PR KERJAKAN BESOKKK!!)
 SELECT
-    a.fullname as name,
-    a.phone as phone,
-    'Sender' as category,
-    t.type as metode,
-    t.nominal
+    acs.fullname as SenderName,
+    ar.fullname as ReceiverName,
+    t.nominal,
+    t.created_at
 from transactions t
-join users u on u.id = t.sender_id
-join account a on a.users_id = u.id
-WHERE u.email = 'habib@gmail.com' AND u.password = 'habib12345'
+join users ur on ur.id = t.receiver_id
+join users us on us.id = t.sender_id
+join account acs on acs.users_id = t.sender_id
+join account ar on ar.users_id = t.receiver_id
+WHERE t.receiver_id = 12 or t.sender_id = 12
 
-UNION ALL
-
-SELECT
-    a.fullname as name,
-    a.phone as phone,
-    'Receiver' as category,
-    t.type as metode,
-    t.nominal
-from transactions t
-join users u on u.id = t.receiver_id
-join account a on a.users_id = u.id
-WHERE u.email = 'habib@gmail.com' AND u.password = 'habib12345'
 
 
 -- Get user history with option (income/expense, date range)
-WITH income_expanse as (
-    SELECT
-        a.fullname as name,
-        a.phone as phone,
-        'Sender' as category,
-        t.type as metode,
-        t.nominal as nominal,
-        t.created_at as date
-    from transactions t
-    join users u on u.id = t.sender_id
-    join account a on a.users_id = u.id
-    WHERE u.email = 'habib@gmail.com' AND u.password = 'habib12345'
+-- misalnya option expanse
+SELECT
+    acs.fullname as SenderName,
+    ar.fullname as ReceiverName,
+    t.nominal,
+    t.created_at
+from transactions t
+join users ur on ur.id = t.receiver_id
+join users us on us.id = t.sender_id
+join account acs on acs.users_id = t.sender_id
+join account ar on ar.users_id = t.receiver_id
+WHERE us.email = 'habib@gmail.com' AND us.password = 'habib12345' and 
+    t.created_at >= '2026-10-24 20:26:14.016099' and t.created_at <= '2026-10-25 21:39:04.783059'
 
-    UNION ALL
-
-    SELECT
-        a.fullname as name,
-        a.phone as phone,
-        'Receiver' as category,
-        t.type as metode,
-        t.nominal as nominal,
-        t.created_at as date
-    from transactions t
-    join users u on u.id = t.receiver_id
-    join account a on a.users_id = u.id
-    WHERE u.email = 'habib@gmail.com' AND u.password = 'habib12345'
-)
-select 
-    name,
-    phone,
-    category,
-    metode,
-    nominal,
-    date
-from income_expanse
-where category = 'Sender' and date between '2026-10-24 20:26:14.016099' and '2026-10-25 21:39:04.783059'
 
 
 -- Get user account information (balance, income, expense)
+SELECT
+    a.balance,
+    (
+        select 
+            sum(t.nominal)
+        from transactions t
+        join users u on u.id = t.receiver_id
+        WHERE u.email = 'habib@gmail.com' AND u.password = 'habib12345'
+    ) as income,
+    (
+         select 
+            sum(t.nominal)
+        from transactions t
+        join users u on u.id = t.sender_id
+        WHERE u.email = 'habib@gmail.com' AND u.password = 'habib12345'
+    ) as expanse
+from account a
+join users u on u.id = a.users_id
+WHERE u.email = 'habib@gmail.com' AND u.password = 'habib12345'
 
 
-
--- Find receiver with pagination (misalnya: habib)
+-- Find receiver with pagination
 select
-    a.fullname,
+    a.fullname as Receiver,
     a.phone
 from transactions t
 join users u on u.id = t.receiver_id
@@ -231,3 +207,10 @@ update users
 set password = 'asta12345678'
 WHERE id = 1
 
+-- Change user profile 
+UPDATE account
+set fullname = 'Habib Jafar',
+    phone = '089912108837',
+    photo = 'habib-serlfi.png',
+    pin = 'habibkece123'
+WHERE id = 12;

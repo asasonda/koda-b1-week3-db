@@ -29,3 +29,6 @@ erDiagram
         timestamp created_at
     }
 ```
+
+## Screenshot ERD
+![Home](Screenshot-ERD.png)

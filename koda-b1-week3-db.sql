@@ -96,8 +96,9 @@ join account a on a.users_id = u.id
 WHERE u.email = 'habib@gmail.com' AND u.password = 'habib12345'
 
 -- Get/Check user PIN
-SELECT u.password
-from users u
+SELECT a.pin as pin
+from account a
+join users u on a.users_id = u.id
 WHERE u.email = 'habib@gmail.com' AND u.password = 'habib12345'
 
 -- Create transaction
@@ -196,6 +197,7 @@ select
     u.email
 from account a 
 join users u on u.id = a.users_id
+WHERE u.email = 'habib@gmail.com' AND u.password = 'habib12345'
 
 -- Change PIN
 update account
@@ -213,4 +215,4 @@ set fullname = 'Habib Jafar',
     phone = '089912108837',
     photo = 'habib-serlfi.png',
     pin = 'habibkece123'
-WHERE id = 12;
+WHERE users_id = 12;
